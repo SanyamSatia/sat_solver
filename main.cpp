@@ -1,5 +1,6 @@
 #include "clause.h"
 #include <cmath>
+#include <ctime>
 #include <iostream>
 #include "solver.h"
 
@@ -24,12 +25,18 @@ void input(int& numVars, vector<Clause>& clauses) {
 
 int main() {
   int numVars;
+  double elapsed_time;
   vector<Clause> clauses;
 
   input(numVars, clauses);
-
   Solver s(numVars, clauses);
+
+  clock_t begin = clock();
   s.solve();
+  clock_t end = clock();
+
+  elapsed_time = double(end - begin) / CLOCKS_PER_SEC;
+  cout<<"Time taken: "<<elapsed_time<<" secs\n";
 
   return 0;
 }
