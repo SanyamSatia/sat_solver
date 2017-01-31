@@ -1,2 +1,7 @@
-# Ignore executables
+# Ignore test files
+Agile
+tests
+
+# Ignore executables and spreadsheets
 *.o
+*.xlsx

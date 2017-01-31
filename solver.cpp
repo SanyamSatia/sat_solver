@@ -1,18 +1,19 @@
-#include <iostream>
-#include <map>
 #include "solver.h"
+#include <vector>
 
 Solver::Solver(int numVars_, vector<Clause>& clauses_) {
   numVars = numVars_;
   clauses = clauses_;
+  varsInClauses = new vector<int> [numVars + 1];
 }
 
-int Solver::clausesAreSatisfiable() {
-  int res;
+int Solver::clausesAreSatisfiable(int var) {
+  int res, clauseNum;
   bool falsePossible = false;
 
-  for(int i = 0; i < clauses.size(); ++i) {
-    res = clauses[i].isSatisfiable(assignments);
+  for(int i = 0; i < varsInClauses[var].size(); ++i) {
+    clauseNum = varsInClauses[var][i];
+    res = clauses[clauseNum].isSatisfiable(assignments);
     if(res == -1) return -1;
     else if(res == 0) falsePossible = true;
   }
@@ -40,19 +41,21 @@ bool Solver::assignUnitClauses() {
 
 void Solver::assignPureVars() {
   int num;
-  map<int, bool> table;
+  bool polarity[numVars + 1][2];
+  memset(polarity, 0, sizeof(polarity));
 
   for(int i = 0; i < clauses.size(); ++i) {
     for(int j = 0; j < clauses[i].getSize(); ++j) {
       num = clauses[i].getAtom(j).getNum();
-      if(clauses[i].getAtom(j).isNeg()) num = -num;
-      table[num] = true;
+      varsInClauses[num].push_back(i);
+      if(clauses[i].getAtom(j).isNeg()) polarity[num][0] = 1;
+      else polarity[num][1] = 1;
     }
   }
 
   for(int i = 1; i <= numVars; ++i) {
-    if(table[i] ^ table[-i]) {
-      assignments[i] = table[i];
+    if(polarity[i][0] ^ polarity[i][1]) {
+      assignments[i] = polarity[i][1];
     }
   }
 }
@@ -63,7 +66,7 @@ bool Solver::backtrack(int ind) {
 
   for(int i = 0; i < 2; ++i) {
     assignments[n] = i;
-    res = clausesAreSatisfiable();
+    res = clausesAreSatisfiable(n);
     if(res == 1) return true;
     else if(res == 0) {
       childRes = backtrack(ind + 1);
@@ -93,26 +96,25 @@ void Solver::solve() {
   }
 
   if(sat) {
-    cout<<"Satisfiable\n";
+    printf("Satisfiable\n");
     for(int i = 1; i <= numVars; ++i) {
-      cout<<i<<": ";
+      printf("%d: ", i);
       if(assignments[i] == 1) {
-        cout<<"T";
+        printf("T");
       }
       else if(assignments[i] == 0) {
-        cout<<"F";
+        printf("F");
       }
       else {
-        cout<<"T/F";
+        printf("T/F");
       }
-      cout<<endl;
+      printf("\n");
     }
   }
   else {
-    cout<<"Unsatisfiable\n";
+    printf("Unsatisfiable\n");
   }
 
-  // cout<<numVars<<' '<<assignments[1]<<endl;
-
   delete[] assignments;
+  delete[] varsInClauses;
 }

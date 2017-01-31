@@ -1,19 +1,18 @@
 #include "clause.h"
-#include <cmath>
+#include <cstdlib>
 #include <ctime>
-#include <iostream>
 #include "solver.h"
 
 void input(int& numVars, vector<Clause>& clauses) {
   int num, numClauses;
 
-  cin>>numVars>>numClauses;
+  scanf("%d %d", &numVars, &numClauses);
 
   for(int i = 0; i < numClauses; ++i) {
     Clause newClause;
 
     while(true) {
-      cin >> num;
+      scanf("%d", &num);
       if(!num) break;
 
       newClause.addAtom(abs(num), num < 0);
@@ -36,7 +35,7 @@ int main() {
   clock_t end = clock();
 
   elapsed_time = double(end - begin) / CLOCKS_PER_SEC;
-  cout<<"Time taken: "<<elapsed_time<<" secs\n";
+  printf("Time taken: %lf secs\n", elapsed_time);
 
   return 0;
 }
