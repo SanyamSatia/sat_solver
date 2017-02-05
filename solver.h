@@ -15,10 +15,9 @@ class Solver {
   Solver(int numVars_, vector<Clause>& clauses_);
   void solve();
   bool backtrack(int n);
-  int clausesAreSatisfiable(int var);
+  int clausesAreSatisfiable();
   bool assignUnitClauses();
   void assignPureVars();
-  void storeVarsInClauses();
 };
 
 #endif

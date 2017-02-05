@@ -4,16 +4,14 @@
 Solver::Solver(int numVars_, vector<Clause>& clauses_) {
   numVars = numVars_;
   clauses = clauses_;
-  varsInClauses = new vector<int> [numVars + 1];
 }
 
-int Solver::clausesAreSatisfiable(int var) {
-  int res, clauseNum;
+int Solver::clausesAreSatisfiable() {
+  int res;
   bool falsePossible = false;
 
-  for(int i = 0; i < varsInClauses[var].size(); ++i) {
-    clauseNum = varsInClauses[var][i];
-    res = clauses[clauseNum].isSatisfiable(assignments);
+  for(int i = 0; i < clauses.size(); ++i) {
+    res = clauses[i].isSatisfiable(assignments);
     if(res == -1) return -1;
     else if(res == 0) falsePossible = true;
   }
@@ -22,24 +20,13 @@ int Solver::clausesAreSatisfiable(int var) {
   else return 1;
 }
 
-void Solver::storeVarsInClauses() {
-  int var;
-
-  for(int i = 0; i < clauses.size(); ++i) {
-    for(int j = 0; j < clauses[i].getSize(); ++j) {
-      var = clauses[i].getAtom(j).getNum();
-      varsInClauses[var].push_back(i);
-    }
-  }
-}
-
 bool Solver::backtrack(int n) {
   int res;
   bool childRes;
 
   for(int i = 0; i < 2; ++i) {
     assignments[n] = i;
-    res = clausesAreSatisfiable(n);
+    res = clausesAreSatisfiable();
     if(res == 1) return true;
     else if(res == 0) {
       childRes = backtrack(n + 1);
@@ -56,8 +43,6 @@ void Solver::solve() {
   bool sat;
   assignments = new int[numVars + 1];
   memset(assignments, -1, sizeof(int) * (numVars + 1));
-
-  storeVarsInClauses();
 
   sat = backtrack(1);
 

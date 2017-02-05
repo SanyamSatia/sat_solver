@@ -4,16 +4,14 @@
 Solver::Solver(int numVars_, vector<Clause>& clauses_) {
   numVars = numVars_;
   clauses = clauses_;
-  varsInClauses = new vector<int> [numVars + 1];
 }
 
-int Solver::clausesAreSatisfiable(int var) {
-  int res, clauseNum;
+int Solver::clausesAreSatisfiable() {
+  int res;
   bool falsePossible = false;
 
-  for(int i = 0; i < varsInClauses[var].size(); ++i) {
-    clauseNum = varsInClauses[var][i];
-    res = clauses[clauseNum].isSatisfiable(assignments);
+  for(int i = 0; i < clauses.size(); ++i) {
+    res = clauses[i].isSatisfiable(assignments);
     if(res == -1) return -1;
     else if(res == 0) falsePossible = true;
   }
@@ -47,7 +45,6 @@ void Solver::assignPureVars() {
   for(int i = 0; i < clauses.size(); ++i) {
     for(int j = 0; j < clauses[i].getSize(); ++j) {
       num = clauses[i].getAtom(j).getNum();
-      varsInClauses[num].push_back(i);
       if(clauses[i].getAtom(j).isNeg()) polarity[num][0] = 1;
       else polarity[num][1] = 1;
     }
@@ -66,9 +63,9 @@ bool Solver::backtrack(int ind) {
 
   for(int i = 0; i < 2; ++i) {
     assignments[n] = i;
-    res = clausesAreSatisfiable(n);
+    res = clausesAreSatisfiable();
     if(res == 1) return true;
-    else if(res == 0) {
+    else if(res == 0 && ind + 1 < unassignedVars.size()) {
       childRes = backtrack(ind + 1);
       if(childRes) return true;
     }
